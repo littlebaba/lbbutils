@@ -3,15 +3,13 @@ from setuptools import setup
 from codecs import open
 import os
 
-here = os.path.abspath(os.path.dirname(__file__))
-
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 setup(
     name='lbbutils',
 
-    version='0.0.2',
+    version='0.0.3',
 
     description='lbbutils - Some tools for neural network and image fusion.',
     long_description=long_description,
