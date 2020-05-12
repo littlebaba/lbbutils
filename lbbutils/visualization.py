@@ -45,11 +45,13 @@ class Visualization:
         if not hasattr(self, 'plot_data'):
             self.plot_data = {'x': [], 'y': []}
         self.plot_data['x'].append(e + iter / self.args.len_dataloader)
-        self.plot_data['y'].append(loss)
-        self.vis.line(Y=self.plot_data['y'],
-                      X=self.plot_data['x'],
+        self.plot_data['y'].append(loss.detach().numpy())
+        x = np.stack(self.plot_data['x'])
+        y = np.stack(self.plot_data['y'])
+        self.vis.line(Y=y,
+                      X=x,
                       opts={
-                          'title': args.name + ' loss over time',
+                          'title': self.args.name + ' loss over time',
                           'xlabel': 'epoch',
                           'ylabel': 'loss'
                       })
@@ -64,7 +66,7 @@ class Visualization:
         """
         ncols = len(visuals)
         imgs = [np.array(img.cpu().detach()[0]) for img in visuals.values()]
-        self.vis.images(imgs, nrow=ncols, padding=2, opts=dict(title=args.name + ' images'))
+        self.vis.images(imgs, nrow=ncols, padding=2, opts=dict(title=self.args.name + ' images'))
         if issave:
             for i, img in visuals.items():
                 utils.save_image(img, os.path.join(self.save_img, f'{e}_{i}.png'))
@@ -78,11 +80,11 @@ if __name__ == '__main__':
 
     visualizer = Visualization(args)
     # visualizer.print_current_loss(1, 5, 0.088, 5.666)
-    # visualizer.plot_current_loss(2, 0.5, 1.8)
+    visualizer.plot_current_loss(2, 0.5, 1.8)
     #
-    dd = {'l': torch.rand((2, 3, 256, 256)),
-          'r': torch.rand((2, 3, 256, 256)),
-          'label': torch.rand((2, 3, 256, 256)),
-          'y': torch.rand((2, 3, 256, 256))}
-
-    visualizer.display_current_result(1, 2, dd)
+    # dd = {'l': torch.rand((2, 3, 256, 256)),
+    #       'r': torch.rand((2, 3, 256, 256)),
+    #       'label': torch.rand((2, 3, 256, 256)),
+    #       'y': torch.rand((2, 3, 256, 256))}
+    #
+    # visualizer.display_current_result(1,dd)
