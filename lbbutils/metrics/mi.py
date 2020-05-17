@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def _MI(im1, im2):
+def _mi(im1, im2):
     im1.astype(np.float64)
     im2.astype(np.float64)
     row, col = im1.shape

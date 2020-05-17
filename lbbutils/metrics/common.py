@@ -15,11 +15,46 @@ def normalize(x: np.ndarray):
         return res.astype(np.int16)
 
 
+def conv(im: np.ndarray, ker: np.ndarray, stride=1, padding=0):
+    """
+
+    :param im numpy.ndarray: (w,h) 2-D
+    :param ker numpy.ndarray: (w,h) 2-D
+    :param stride:
+    :param padding:
+    :return:
+    """
+    r, c = im.shape
+    pad_im = np.zeros((r + 2 * padding, c + 2 * padding))
+    r_p, c_p = pad_im.shape
+    pad_im[padding:r_p - padding, padding:c_p - padding] = im
+    im = pad_im
+    out_size = (r_p - ker.shape[0]) // stride + 1
+    ret = np.zeros((out_size, out_size))
+    for ri in range(0, out_size * stride, stride):
+        for ci in range(0, out_size * stride, stride):
+            region = im[ri:ri + ker.shape[0], ci:ci + ker.shape[0]]
+            ret[ri // stride, ci // stride] = np.sum(region * ker)
+
+    return ret
+
+
 if __name__ == '__main__':
     import torch
 
-    x = torch.rand((1, 1, 5, 5))
-    lam = lambda x: x.data.squeeze(0).permute((1, 2, 0)).numpy()
-    x_ = lam(x)
-    ret = normalize(x_)
+    # # (1)normalize
+    # x = torch.rand((1, 1, 5, 5))
+    # lam = lambda x: x.data.squeeze(0).permute((1, 2, 0)).numpy()
+    # x_ = lam(x)
+    # ret = normalize(x_)
+    # a = 1
+
+    # (2) conv
+    im = np.array([[1, 1, 1, 1, 1],
+                   [2, 2, 2, 2, 2],
+                   [3, 3, 3, 3, 3],
+                   [4, 3, 4, 3, 2],
+                   [3, 1, 5, 7, 3]])  # 1,1,1,1,1;2,2,2,2,2;3,3,3,3,3
+    ker = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])  # -1 0 1 ; -2 0 2 ; -1 0 1
+    ret = conv(im, ker,padding=1)
     a = 1

@@ -1,10 +1,10 @@
 import numpy as np
-from lbbutils.metrics.MI import _MI
+from lbbutils.metrics.mi import _mi
 
 
 def _q_mi(im1: np.ndarray, im2: np.ndarray, fim: np.ndarray):
-    [I_fx, H_xf, H_x, H_f1] = _MI(im1, fim)
-    [I_fy, H_yf, H_y, H_f2] = _MI(im2, fim)
+    [I_fx, H_xf, H_x, H_f1] = _mi(im1, fim)
+    [I_fy, H_yf, H_y, H_f2] = _mi(im2, fim)
 
     res = 2 * (I_fx / (H_f1 + H_x) + I_fy / (H_f2 + H_y))
     return res
