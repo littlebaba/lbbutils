@@ -35,8 +35,17 @@ def conv(im: np.ndarray, ker: np.ndarray, stride=1, padding=0):
         for ci in range(0, out_size * stride, stride):
             region = im[ri:ri + ker.shape[0], ci:ci + ker.shape[0]]
             ret[ri // stride, ci // stride] = np.sum(region * ker)
-
     return ret
+
+
+def create_window(win_size):
+    def gaussian(win_size, sigma):
+        gauss = np.array([np.exp(-(x - win_size // 2) ** 2 / float(2 * sigma ** 2)) for x in range(win_size)])
+        return gauss / np.sum(gauss)
+
+    _1D_window = np.expand_dims(gaussian(win_size, 1.5), 1)
+    _2D_window = np.dot(_1D_window, _1D_window.T)
+    return _2D_window
 
 
 if __name__ == '__main__':
@@ -50,11 +59,15 @@ if __name__ == '__main__':
     # a = 1
 
     # (2) conv
-    im = np.array([[1, 1, 1, 1, 1],
-                   [2, 2, 2, 2, 2],
-                   [3, 3, 3, 3, 3],
-                   [4, 3, 4, 3, 2],
-                   [3, 1, 5, 7, 3]])  # 1,1,1,1,1;2,2,2,2,2;3,3,3,3,3
-    ker = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])  # -1 0 1 ; -2 0 2 ; -1 0 1
-    ret = conv(im, ker,padding=1)
+    # im = np.array([[1, 1, 1, 1, 1],
+    #                [2, 2, 2, 2, 2],
+    #                [3, 3, 3, 3, 3],
+    #                [4, 3, 4, 3, 2],
+    #                [3, 1, 5, 7, 3]])  # 1,1,1,1,1;2,2,2,2,2;3,3,3,3,3
+    # ker = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])  # -1 0 1 ; -2 0 2 ; -1 0 1
+    # ret = conv(im, ker, padding=1)
+
+    # (3) create_window
+    create_window(7)
+
     a = 1
