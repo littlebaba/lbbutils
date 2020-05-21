@@ -21,7 +21,7 @@ def conv(im: np.ndarray, ker: np.ndarray, stride=1, padding=0):
     :param im numpy.ndarray: (w,h) 2-D
     :param ker numpy.ndarray: (w,h) 2-D
     :param stride:
-    :param padding:
+    :param padding: 1 is 'same',0 is 'valid'.
     :return:
     """
     r, c = im.shape
@@ -48,6 +48,23 @@ def create_window(win_size):
     return _2D_window
 
 
+def ssim_yang(im1, im2):
+    C1 = 2e-16;
+    C2 = 2e-16;
+    window = create_window(7)
+    window = window / np.sum(window)
+    mu1 = conv(im1, window)
+    mu2 = conv(im2, window)
+    mu1_sq = mu1 * mu1
+    mu2_sq = mu2 * mu2
+    mu1_mu2 = mu1 * mu2
+    sigma1_sq = conv(im1 * im1, window) - mu1_sq
+    sigma2_sq = conv(im2 * im2, window) - mu2_sq
+    sigma12 = conv(im1 * im2, window) - mu1_mu2
+    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
+    return ssim_map, sigma1_sq, sigma2_sq
+
+
 if __name__ == '__main__':
     import torch
 
@@ -65,9 +82,15 @@ if __name__ == '__main__':
     #                [4, 3, 4, 3, 2],
     #                [3, 1, 5, 7, 3]])  # 1,1,1,1,1;2,2,2,2,2;3,3,3,3,3
     # ker = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])  # -1 0 1 ; -2 0 2 ; -1 0 1
-    # ret = conv(im, ker, padding=1)
+    # ret = conv(im, ker, padding=0)
 
     # (3) create_window
-    create_window(7)
+    # create_window(7)
 
-    a = 1
+    # (4) ssim_yang
+    from PIL import Image
+
+    m1 = np.array(Image.open('../test/fused1_ours.png'), dtype=np.float64)[:, :, 0]
+    m2 = np.array(Image.open('../test/fused2_ours.png'), dtype=np.float64)[:, :, 0]
+    fim = np.array(Image.open('../test/fused3_ours.png'), dtype=np.float64)[:, :, 0]
+    ssim_yang(m1, m2)
