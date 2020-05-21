@@ -7,8 +7,8 @@ def normalize(x: np.ndarray):
     :param x numpy.ndarray: x.shape (w,h,1)
     :return res numpy.ndarray: res.shape (w,h) astype=int16
     """
-    if x.shape[2] == 1:
-        data = x.squeeze()
+    if len(x.shape) == 2:
+        data = x
         fz = data - np.min(data)
         fm = np.max(data) - np.min(data)
         res = fz / fm * 255
@@ -65,6 +65,15 @@ def ssim_yang(im1, im2):
     return ssim_map, sigma1_sq, sigma2_sq
 
 
+def freqspace(num):
+    lam = lambda x: np.arange(-x + 1, x, 2) / x if x // 2 == 1 else np.arange(-x, x - 1, 2) / x
+    f1 = lam(num[0])
+    f2 = lam(num[1])
+
+    m, n = np.meshgrid(f1, f2)
+    return n.T, m.T
+
+
 if __name__ == '__main__':
     import torch
 
@@ -88,9 +97,13 @@ if __name__ == '__main__':
     # create_window(7)
 
     # (4) ssim_yang
-    from PIL import Image
+    # from PIL import Image
+    #
+    # m1 = np.array(Image.open('../test/fused1_ours.png'), dtype=np.float64)[:, :, 0]
+    # m2 = np.array(Image.open('../test/fused2_ours.png'), dtype=np.float64)[:, :, 0]
+    # fim = np.array(Image.open('../test/fused3_ours.png'), dtype=np.float64)[:, :, 0]
+    # ssim_yang(m1, m2)
 
-    m1 = np.array(Image.open('../test/fused1_ours.png'), dtype=np.float64)[:, :, 0]
-    m2 = np.array(Image.open('../test/fused2_ours.png'), dtype=np.float64)[:, :, 0]
-    fim = np.array(Image.open('../test/fused3_ours.png'), dtype=np.float64)[:, :, 0]
-    ssim_yang(m1, m2)
+    # (5) freqspace()
+    u, v = freqspace([3, 4])
+    a = 1
