@@ -1,8 +1,19 @@
 import numpy as np
 from lbbutils.metrics.common import conv
+from PIL import Image
+
+np.seterr(divide='ignore', invalid='ignore')
 
 
 def _q_g(im1: np.ndarray, im2: np.ndarray, fim: np.ndarray):
+    """
+        Ref: Objective Pixel-level Image Fusion Performance Measure, Proc. SPIE 4051, 89 (2000)
+        by C. Xydeas
+    :param im1:
+    :param im2:
+    :param fim:
+    :return:
+    """
     ker1 = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
     ker2 = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
     # get the map
@@ -18,7 +29,8 @@ def _q_g(im1: np.ndarray, im2: np.ndarray, fim: np.ndarray):
 
     Wa = im1G
     Wb = im2G
-    res = np.mean((Qaf * Wa + Qbf * Wb) / (Wa + Wb));
+    tmp = (Qaf * Wa + Qbf * Wb) / (Wa + Wb)
+    res=np.nanmean(tmp)
     return res
 
 
@@ -62,23 +74,8 @@ def get_map(matrix, ker1, ker2):
 
 
 if __name__ == '__main__':
-    # x = [1, 2, 3, 2, 3;
-    # 4, 5, 6, 5, 6;
-    # 7, 8, 9, 8, 9;
-    # 2, 3, 2, 4, 1;
-    # 4, 2, 1, 4, 1];
-    # y = [2, 3, 5, 3, 5;
-    # 3, 4, 5, 4, 5;
-    # 5, 7, 4, 7, 4;
-    # 5, 3, 2, 2, 1;
-    # 6, 3, 1, 3, 1];
-    # fim = [1, 1, 1, 1, 1;
-    # 2, 2, 2, 2, 2;
-    # 3, 3, 3, 3, 3;
-    # 4, 3, 4, 3, 2;
-    # 3, 1, 5, 7, 3];
-    im1 = np.array([[1, 2, 3, 2, 3], [4, 5, 6, 5, 6], [7, 8, 9, 8, 9], [2, 3, 2, 4, 1], [4, 2, 1, 4, 1]])
-    im2 = np.array([[2, 3, 5, 3, 5], [3, 4, 5, 4, 5], [5, 7, 4, 7, 4], [5, 3, 2, 2, 1], [6, 3, 1, 3, 1]])
-    fim = np.array([[1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3], [4, 3, 4, 3, 2], [3, 1, 5, 7, 3]])
-    res = _q_g(im1, im2, fim)
+    m1 = np.array(Image.open('../test/res/left.png'), dtype=np.float64)
+    m2 = np.array(Image.open('../test/res/right.png'), dtype=np.float64)
+    fim = np.array(Image.open('../test/res/fim.png'), dtype=np.float64)
+    res = _q_g(m1, m2, fim)
     a = 1

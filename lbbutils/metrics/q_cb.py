@@ -4,6 +4,14 @@ from numpy.fft import fft2, fftshift, ifftshift, ifft2
 
 
 def _q_cb(im1, im2, fim):
+    """
+        Ref: A new automated quality assessment algorithm for image fusion, Image and Vision Computing, 27 (2009) 1421-1432
+        By Yin Chen et al.
+    :param im1:
+    :param im2:
+    :param fim:
+    :return:
+    """
     im1 = im1 / 255
     im2 = im2 / 255
     fim = fim / 255
@@ -42,15 +50,15 @@ def _q_cb(im1, im2, fim):
     G2 = gaussian2d(4)
 
     k, p, q, h, Z = 1, 3, 2, 1, 0.0001
-    C1 = contrast(G1, G2, fim1)
+    C1 = contrast(G1, G2, np.real(fim1))
     C1 = abs(C1)
     C1P = (k * (np.power(C1, p))) / (h * (np.power(C1, q)) + Z)
 
-    C2 = contrast(G1, G2, fim2)
+    C2 = contrast(G1, G2, np.real(fim2))
     C2 = abs(C2)
     C2P = (k * (np.power(C2, p))) / (h * (np.power(C2, q)) + Z)
 
-    Cf = contrast(G1, G2, ffim)
+    Cf = contrast(G1, G2, np.real(ffim))
     Cf = abs(Cf)
     CfP = (k * (np.power(Cf, p))) / (h * (np.power(Cf, q)) + Z)
 
@@ -72,8 +80,8 @@ def _q_cb(im1, im2, fim):
 if __name__ == '__main__':
     from PIL import Image
 
-    m1 = np.array(Image.open('../test/fused1_ours.png'), dtype=np.float64)[:, :, 0]
-    m2 = np.array(Image.open('../test/fused2_ours.png'), dtype=np.float64)[:, :, 0]
-    fim = np.array(Image.open('../test/fused3_ours.png'), dtype=np.float64)[:, :, 0]
-    ret = _q_cb(fim, fim, fim)
+    m1 = np.array(Image.open('../test/res/left.png'), dtype=np.float64)
+    m2 = np.array(Image.open('../test/res/right.png'), dtype=np.float64)
+    fim = np.array(Image.open('../test/res/fim.png'), dtype=np.float64)
+    ret = _q_cb(m1, m2, fim)
     a = 1

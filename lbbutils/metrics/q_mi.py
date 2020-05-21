@@ -1,8 +1,18 @@
 import numpy as np
 from lbbutils.metrics.mi import _mi
+from PIL import Image
 
 
 def _q_mi(im1: np.ndarray, im2: np.ndarray, fim: np.ndarray):
+    """
+        Ref: Comments on "Information measure for performance of image fusion"
+        By M. Hossny et al.
+        Electronics Letters Vol. 44, No.18, 2008
+    :param im1:
+    :param im2:
+    :param fim:
+    :return:
+    """
     [I_fx, H_xf, H_x, H_f1] = _mi(im1, fim)
     [I_fy, H_yf, H_y, H_f2] = _mi(im2, fim)
 
@@ -18,7 +28,8 @@ if __name__ == '__main__':
     # y_ = lam(img2)
     # ret1 = normalize(x_)
     # ret2 = normalize(y_)
-    ret1 = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    ret2 = np.array([[2, 3, 5], [3, 4, 5], [5, 7, 4]])
-    fim = np.array([[10, 10, 10], [10, 10, 10], [10, 10, 10]])
-    _q_mi(ret1, ret2, fim)
+    m1 = np.array(Image.open('../test/res/left.png'), dtype=np.float64)
+    m2 = np.array(Image.open('../test/res/right.png'), dtype=np.float64)
+    fim = np.array(Image.open('../test/res/fim.png'), dtype=np.float64)
+    ret = _q_mi(m1, m2, fim)
+    a = 1
