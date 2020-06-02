@@ -26,17 +26,13 @@ class SSIM(torch.nn.Module):
             window = Variable(_2D_window.expand(channel, 1, window_size, window_size).contiguous())
             return window
 
-        if channel == 1 and self.window.data.type() == img1.data.type():
-            window = create_window(self.window_size, 1)
-        else:
-            window = create_window(self.window_size, channel)
 
-            if img1.is_cuda:
-                window = window.cuda(img1.get_device())
-            window = window.type_as(img1)
-
-            self.window = window
-            self.channel = channel
+        window = create_window(self.window_size, channel)
+        if img1.is_cuda:
+            window = window.cuda(img1.get_device())
+        window = window.type_as(img1)
+        self.window = window
+        self.channel = channel
 
         def _ssim(img1, img2, window, window_size, channel, size_average=True):
             mu1 = F.conv2d(img1, window, padding=window_size // 2, groups=channel)
@@ -100,8 +96,9 @@ class ColorLoss(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    x1 = torch.rand((1, 3, 3, 3), requires_grad=True)
-    x2 = torch.rand((1, 3, 3, 3))
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    x1 = torch.rand((1, 3, 100, 100), requires_grad=True).to(device)
+    x2 = torch.rand((1, 3, 100, 100)).to(device)
     # print(x1)
     loss = SSIM()
     res = loss(x1, x2)

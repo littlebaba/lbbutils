@@ -9,7 +9,7 @@ with open('README.md') as f:
 setup(
     name='lbbutils',
 
-    version='0.0.8',
+    version='0.0.12',
 
     description='lbbutils - Some tools for neural network and image fusion.',
     long_description=long_description,

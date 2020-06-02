@@ -45,7 +45,7 @@ class Visualization:
         if not hasattr(self, 'plot_data'):
             self.plot_data = {'x': [], 'y': []}
         self.plot_data['x'].append(e + iter / self.args.len_dataloader)
-        self.plot_data['y'].append(loss.detach().numpy())
+        self.plot_data['y'].append(loss)
         x = np.stack(self.plot_data['x'])
         y = np.stack(self.plot_data['y'])
         self.vis.line(Y=y,
