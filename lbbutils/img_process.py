@@ -3,6 +3,7 @@ from os import listdir
 from os.path import join
 from typing import Tuple, List, Any
 
+import numpy as np
 import torchvision.transforms.functional as F
 from PIL import Image
 from PIL import ImageFilter
@@ -76,5 +77,53 @@ def path_match(root, word):
     return join(root, tmp[-1])
 
 
+def gaussian2D(x, y):
+    sigma = 1
+    return 1 / (2 * np.pi * sigma ** 2) * np.exp(-(x ** 2 + y ** 2) / 2 * sigma ** 2)
+
+
+def get_blur_filter(r):
+    size = 2 * r + 1
+    filter = np.zeros((size, size))
+    for row in range(size):
+        for col in range(size):
+            filter[row, col] = gaussian2D(row - r, col - r)
+    sum = np.sum(filter)
+    filter = filter / sum
+    return filter
+
+
+def get_one_blurpoint(img, point, filter):
+    r = filter.shape[0] // 2
+    height, width = img.shape
+    c_x, c_y = point
+    min_x, min_y = c_x - r, c_y - r
+    max_x, max_y = c_x + r, c_y + r
+    tmp = 0
+    for i in range(min_y, max_y + 1):
+        for j in range(min_x, max_x + 1):
+            now_x, now_y = j, i
+            if j < 0:
+                now_x = -j
+            if i < 0:
+                now_y = -i
+            if j > width - 1:
+                now_x = width - 1 - j
+            if i > height - 1:
+                now_y = height - 1 - i
+            tmp += filter[i - min_y, j - min_x] * img[now_x, now_y]
+    img[c_x, c_y] = tmp
+    return img
+
+
 if __name__ == '__main__':
-    pass
+    img = Image.open('test/res/fim.png')
+    im = np.array(img)
+    ret = np.zeros_like(im)
+    row, col = im.shape
+    filter = get_blur_filter(3)
+    for i in range(row):
+        for j in range(col):
+            get_one_blurpoint(im, (j, i), filter)
+    res = Image.fromarray(im)
+    res.save('test/res/fim_blured3_sigma1.png')
