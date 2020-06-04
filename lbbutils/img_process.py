@@ -53,6 +53,29 @@ class BlurImage(object):
         return l, r, image
 
 
+class BlurImageRandomly:
+    def __init__(self, radius=3, sigma=1):
+        self.radius = radius
+        self.sigma = sigma
+
+    def __call__(self, image):
+        im = np.array(image)
+        left = im.copy()
+        right = im.copy()
+        row, col = im.shape
+        filter = get_blur_filter(self.radius, self.sigma)
+        mask = np.random.randint(0, 2, (row, col))
+
+        for i in range(row):
+            for j in range(col):
+                if mask[j, i] == 1:
+                    get_one_blurpoint(left, (j, i), filter)
+                if mask[j, i] == 0:
+                    get_one_blurpoint(right, (j, i), filter)
+        l, r, image = Image.fromarray(left), Image.fromarray(right), Image.fromarray(im)
+        return l, r, image
+
+
 class ToTensors(object):
     def __call__(self, pic):
         return F.to_tensor(pic[0]), F.to_tensor(pic[1]), F.to_tensor(pic[2])
@@ -77,17 +100,16 @@ def path_match(root, word):
     return join(root, tmp[-1])
 
 
-def gaussian2D(x, y):
-    sigma = 1
+def gaussian2D(x, y, sigma=1):
     return 1 / (2 * np.pi * sigma ** 2) * np.exp(-(x ** 2 + y ** 2) / 2 * sigma ** 2)
 
 
-def get_blur_filter(r):
+def get_blur_filter(r, sigma=1):
     size = 2 * r + 1
     filter = np.zeros((size, size))
     for row in range(size):
         for col in range(size):
-            filter[row, col] = gaussian2D(row - r, col - r)
+            filter[row, col] = gaussian2D(row - r, col - r, sigma=sigma)
     sum = np.sum(filter)
     filter = filter / sum
     return filter
@@ -118,12 +140,17 @@ def get_one_blurpoint(img, point, filter):
 
 if __name__ == '__main__':
     img = Image.open('test/res/fim.png')
-    im = np.array(img)
-    ret = np.zeros_like(im)
-    row, col = im.shape
-    filter = get_blur_filter(3)
-    for i in range(row):
-        for j in range(col):
-            get_one_blurpoint(im, (j, i), filter)
-    res = Image.fromarray(im)
-    res.save('test/res/fim_blured3_sigma1.png')
+    # im = np.array(img)
+    # ret = np.zeros_like(im)
+    # row, col = im.shape
+    # filter = get_blur_filter(3)
+    # for i in range(row):
+    #     for j in range(col):
+    #         get_one_blurpoint(im, (j, i), filter)
+    # res = Image.fromarray(im)
+    # res.save('test/res/fim_blured3_sigma1.png')
+    bir = BlurImageRandomly()
+    l, r, image = bir(img)
+    l.save('test/res/bir_l.png')
+    r.save('test/res/bir_r.png')
+    image.save('test/res/bir_img.png')
