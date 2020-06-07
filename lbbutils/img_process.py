@@ -1,3 +1,5 @@
+import concurrent.futures as cf
+import itertools
 from fnmatch import fnmatchcase as match
 from os import listdir
 from os.path import join
@@ -72,6 +74,7 @@ class BlurImageRandomly:
                     get_one_blurpoint(left, (j, i), filter)
                 if mask[j, i] == 0:
                     get_one_blurpoint(right, (j, i), filter)
+
         l, r, image = Image.fromarray(left), Image.fromarray(right), Image.fromarray(im)
         return l, r, image
 
