@@ -17,4 +17,6 @@ if __name__ == '__main__':
     # TODO 测试gradient
     img = Image.open("./test/res/left.png")
     img=ToTensor()(img)
-    print(img.shape)
+    img=torch.squeeze(img,0)
+    new_img=gradient(img)
+    print(new_img.shape)
