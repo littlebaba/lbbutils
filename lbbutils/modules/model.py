@@ -30,6 +30,39 @@ class PatchEmbed(nn.Module):
         return x
 
 
+class Attention(nn.Module):
+    def __int__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop_ratio=0., proj_drop_ratio=0.):
+        '''
+
+        Args:
+            dim:
+            num_heads:
+            qkv_bias:
+            qk_scale:
+            attn_drop_ratio:
+            proj_drop_ratio:
+
+        Returns:
+
+        '''
+        super(Attention, self).__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = qk_scale or head_dim ** -0.5
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop_ratio)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop_ratio)
+
+
+class Block(nn.Module):
+    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_ratio=0., attn_drop_ratio=0.,
+                 drop_path_ratio=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm):
+        super(Block, self).__init__()
+        self.norm1 = norm_layer(dim)
+        pass
+
+
 if __name__ == '__main__':
     img = torch.ones((2, 3, 224, 224))
     model = PatchEmbed()
