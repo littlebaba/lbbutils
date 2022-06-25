@@ -43,7 +43,7 @@ class ASPP(nn.Module):
         modules.append(ASPPConv(in_channels, out_channels, rate2))
         modules.append(ASPPConv(in_channels, out_channels, rate3))
         modules.append(ASPPPooling(in_channels, out_channels))
-
+        b=1
         self.convs = nn.ModuleList(modules)
         self.project = nn.Sequential(
             nn.Conv2d(5 * out_channels, out_channels, 1, bias=False),
@@ -51,6 +51,7 @@ class ASPP(nn.Module):
             nn.ReLU(inplace=True),
             nn.Dropout(0.5)
         )
+        a = 1
 
     def forward(self, x):
         res = []
@@ -61,7 +62,12 @@ class ASPP(nn.Module):
 
 
 if __name__ == '__main__':
-    features = torch.rand((1, 1, 64, 64))
-    aspp = ASPP(1, 1, [6, 8, 10])
-    out = aspp(features)
+    # features = torch.rand((1, 1, 64, 64))
+    # aspp = ASPP(1, 1, [6, 8, 10])
+    #
+    # out = aspp(features)
+    
+    print(ASPP)
+    print(ASPP.forward)
     a = 1
+

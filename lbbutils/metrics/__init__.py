@@ -8,6 +8,6 @@ from .q_y import _q_y as Qy
 
 
 def metrics(l, r, pred):
-    lamb = lambda x: np.array(x.squeeze(), dtype=np.float64)
+    lamb = lambda x: np.array(x.squeeze().cpu(), dtype=np.float64)
     l, r, pred = lamb(l), lamb(r), lamb(pred)
     return Qim(l, r, pred), Qg(l, r, pred), Qy(l, r, pred), Qcb(l, r, pred)

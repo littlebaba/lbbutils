@@ -1,7 +1,6 @@
-from setuptools import setup
-
 from codecs import open
-import os
+
+from setuptools import setup, find_packages
 
 with open('README.md') as f:
     long_description = f.read()
@@ -9,7 +8,7 @@ with open('README.md') as f:
 setup(
     name='lbbutils',
 
-    version='0.0.13',
+    version='0.0.17',
 
     description='lbbutils - Some tools for neural network and image fusion.',
     long_description=long_description,
@@ -31,7 +30,7 @@ setup(
 
     keywords='deep-learning multi-focus',
 
-    packages=['lbbutils'],
+    packages=['lbbutils','lbbutils/metrics'],
     install_requires=[
         'numpy',
     ]
