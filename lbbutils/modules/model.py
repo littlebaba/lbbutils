@@ -55,7 +55,7 @@ class Attention(nn.Module):
         self.proj_drop = nn.Dropout(proj_drop_ratio)
 
     def forward(self, x):
-        B, N, C = x.shape  # [B, 197, 768]
+        B, N, C = x.shape  # [B, 196, 768]
         qkv_1 = self.qkv(x)  # (2,196,2304)
         qkv_2 = qkv_1.reshape(B, N, 3, self.num_heads, C // self.num_heads)  # (2,196,3,12,64)
         qkv = qkv_2.permute(2, 0, 3, 1, 4)  # (3,2,12,196,64)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # 测试PatchEmbed
     img = torch.ones((2, 3, 224, 224))
     model = PatchEmbed()
-    y = model(img)
+    y = model(img) #（2,196,768）
     # 测试 Attention
     att = Attention()
     att_out = att(y)
