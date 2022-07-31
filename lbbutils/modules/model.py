@@ -90,13 +90,14 @@ class Mlp(nn.Module):
         self.fc2 = nn.Linear(hidden_features, out_features)
         self.drop = nn.Dropout(drop)
 
-    def forward(self,x):
-        x = self.fc1(x)
+    def forward(self, x):
+        x = self.fc1(x)  # (2,196,48)
         x = self.act(x)
         x = self.drop(x)
-        x = self.fc2(x)
+        x = self.fc2(x)  # (2,196,768)
         x = self.drop(x)
         return x
+
 
 class Block(nn.Module):
     def __init__(self, dim=768, num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_ratio=0., attn_drop_ratio=0.,
@@ -122,8 +123,12 @@ class Block(nn.Module):
         self.drop_path = nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
+        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop_ratio)
 
-        pass
+    def forward(self, x):
+        x = x + self.drop_path(self.att(self.norm1(x)))
+        x = x + self.drop_path(self.mlp(self.norm2(x)))
+        return x
 
 
 if __name__ == '__main__':
