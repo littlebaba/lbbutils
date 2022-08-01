@@ -2,6 +2,9 @@ import os
 import sys
 import tarfile
 import urllib
+import dill as pickle
+import spacy
+import torchtext
 
 
 def file_exist(dir_name, file_name):
@@ -117,3 +120,66 @@ def complie_files(raw_dir, raw_files, prefix):
                     trg_inf.write(line.replace('\r', ' ').strip() + '\n')
                 assert cntr == 0, "Number of lines in two files are inconsistent."
     return src_fpath, trg_fpath
+
+
+def mkdir_if_needed(dir_name):
+    '''
+    如果目录不存在，创建目录
+    Args:
+        dir_name:
+
+    Returns:
+
+    '''
+    if not os.path.isdir(dir_name):
+        os.makedirs(dir_name)
+
+
+PAD_WORD = '<blank>'
+UNK_WORD = '<unk>'
+BOS_WORD = '<s>'
+EOS_WORD = '</s>'
+
+
+def main_WMT16():
+    src_lang_model = spacy.load('de_core_news_sm')
+    trg_lang_model = spacy.load('en_core_web_sm')
+
+    def tokenize_src(text):
+        return [tok.text for tok in src_lang_model.tokenizer(text)]
+
+    def tokenize_trg(text):
+        return [tok.text for tok in trg_lang_model.tokenizer(text)]
+
+    SRC = torchtext.legacy.data.Field(tokenize=tokenize_src, lower=True, pad_token=PAD_WORD, init_token=BOS_WORD, eos_token=EOS_WORD)
+    TRG = torchtext.legacy.data.Field(tokenize=tokenize_trg, lower=True, pad_token=PAD_WORD, init_token=BOS_WORD, eos_token=EOS_WORD)
+
+    MAX_LEN = 100
+    MIN_FREQ = 3
+
+    def filter_examples_with_length(x):
+        return len(vars(x)['src'] <= MAX_LEN and len(vars(x)['trg']) <= MAX_LEN)
+
+    # train, val, test = torchtext.datasets.Multi30k.split(
+    #     exts=('.' + 'de', '.' + 'en'),
+    #     fields=(SRC, TRG),
+    #     filter_pred=filter_examples_with_length
+    # )
+
+    train, val, test = torchtext.datasets.Multi30k(root='.data', split=('train', 'valid', 'test'), language_pair=('de', 'en'))
+
+    SRC.build_vocab(train.src,min_freq=MIN_FREQ)
+    TRG.build_vocab(train.trg,min_freq=MIN_FREQ)
+
+    data = {
+        #'settings': opt,
+        'vocab':{'src':SRC,'trg':TRG},
+        'train':train.examples,
+        'valid':val.examples,
+        'test':val.examples
+    }
+    print('[info] Dumping the processed data to pickle file',"m30k_deen_shr.pkl")
+    pickle.dump(data,open('m30k_deen_shr.pkl','wb'))
+
+if __name__ == '__main__':
+    main_WMT16()
