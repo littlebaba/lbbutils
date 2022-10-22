@@ -130,12 +130,23 @@ class TokenEmbedding(nn.Module):
         return self.embedding(tokens.long()) * math.sqrt(self.emb_size)
 
 
+"""
+SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
+TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
+EMB_SIZE = 512
+NHEAD = 8
+FFN_HID_DIM = 512
+BATCH_SIZE = 128
+NUM_ENCODER_LAYERS = 3
+NUM_DECODER_LAYERS = 3
+"""
+
 # Seq2Seq Network
 class Seq2SeqTransformer(nn.Module):
     def __init__(self,
                  num_encoder_layers: int,
                  num_decoder_layers: int,
-                 emb_size: int,
+                 emb_size: int,# 512
                  nhead: int,
                  src_vocab_size: int,
                  tgt_vocab_size: int,
@@ -244,7 +255,9 @@ optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.
 
 from torch.nn.utils.rnn import pad_sequence
 
-
+'''
+没有看懂
+'''
 # helper function to club together sequential operations
 def sequential_transforms(*transforms):
     def func(txt_input):
